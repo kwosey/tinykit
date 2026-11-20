@@ -1,20 +1,10 @@
-# AGENTS.md — Tiny Kit
+# Tiny Kit
 
-## Product intent
-Build playful, compact interactive experiments. Optimize for time-to-first-play and exploration, not maximal feature counts.
+Build compact, playful experiments. Tiny Scenes is the first one. Keep the time to first play short.
 
-## Non-negotiable boundaries
-- Tiny Kit is independent of Hequ and Job Search HQ.
-- Never alter any other project's repository, domain, database, or Vercel configuration.
-- The existing Vercel project is named `tinykit`. Do not create a duplicate.
-- **The repo starts as documentation-only.** Do not enable production Git deployment until the original deployed prototype is recovered into the repository, compared and smoke-tested.
-- Do not silently replace the initial deployed prototype with a blank starter screen.
-- Prefer focused branches and reviewable PRs. Do not merge or release to production without user approval.
-- Preserve users' saved drafts when modifying data formats or localStorage keys.
-- No AI-generated creative content unless explicitly required by a future experiment.
-
-## Technical direction, not yet implemented
-- Small independent modules: rendering, scene model, playback, controls, persistence.
-- Shared primitives: controls, presets, deterministic randomization, lock/mutate, save/restore — but extract only from repeated real use.
-- Add basic unit and browser smoke tests before feature expansion.
-- Document actual implementation rather than inventing architecture.
+- Work in this project only. Hequ and Job Search HQ have separate source, storage, deployment and DNS.
+- Use the existing Vercel project named `tinykit`. Preserve the original API deployment until the current implementation is compared and smoke-tested. Production and PR merges require explicit user approval.
+- Preserve saved drafts when changing data formats or localStorage keys. See [DATA_CONTRACTS.md](DATA_CONTRACTS.md).
+- Keep the scene engine independent of React. Keep shared primitives limited to patterns used by the editor. See [ARCHITECTURE.md](ARCHITECTURE.md).
+- Keep scene art in the existing geometric style. Creative content generation is outside this release.
+- Run `npm ci`, `npm test`, and `npm run build`. For editor changes, exercise desktop and mobile using [TESTING.md](TESTING.md).
