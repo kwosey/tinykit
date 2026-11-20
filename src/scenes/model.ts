@@ -28,6 +28,7 @@ export interface SceneObject {
   text: string
   locked: boolean
   motion: Motion
+  track?: readonly Motion[]
 }
 
 export interface Scene {
@@ -36,6 +37,7 @@ export interface Scene {
   duration: number
   seed: number
   objects: SceneObject[]
+  environmentChange?: { time: number; to: Environment }
 }
 
 export const colors = ['#ed916a', '#e6bc79', '#8d997a', '#73938b', '#d3978b', '#e9d6b3']

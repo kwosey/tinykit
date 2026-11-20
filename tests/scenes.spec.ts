@@ -1,12 +1,20 @@
 import { expect, test } from '@playwright/test'
 import { readFile } from 'node:fs/promises'
+import { initialScene } from '../src/scenes/model'
 
 test('edit, animate, save, reload, restore and export a populated scene', async ({ page, isMobile }) => {
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()) })
-  await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'Tiny Scenes' })).toBeVisible()
+  await page.addInitScript(scene => {
+    if (!localStorage.getItem('tinykit.scenes.v1.draft')) {
+      localStorage.setItem('tinykit.scenes.v1.draft', JSON.stringify(scene))
+      localStorage.setItem('tinykit.scenes.v1.saved', JSON.stringify(scene))
+    }
+  }, initialScene)
+  await page.goto('/#tiny-scenes')
+  await expect(page.getByRole('heading', { name: 'Free scene' })).toBeVisible()
+  await expect(page.getByRole('list', { name: 'Story beats' })).toHaveCount(0)
   const canvas = page.getByLabel('Scene preview')
   const rect = (await canvas.boundingBox())!
   const x = rect.x + rect.width * 365 / 960
@@ -34,11 +42,12 @@ test('edit, animate, save, reload, restore and export a populated scene', async 
   await page.getByRole('button', { name: 'Mutate' }).click()
   await expect(page.getByRole('slider', { name: 'X position' })).toHaveValue('444')
   await page.getByRole('button', { name: 'Night' }).click()
-  await page.getByRole('button', { name: 'Save', exact: true }).click()
+  await page.getByRole('button', { name: 'Keep', exact: true }).click()
   await page.reload()
   await expect(page.getByRole('button', { name: 'Night' })).toHaveAttribute('aria-pressed', 'true')
   await page.getByRole('button', { name: 'Desert' }).click()
-  await page.getByRole('button', { name: 'Restore' }).click()
+  await page.getByRole('button', { name: /Collection/ }).click()
+  await page.getByRole('button', { name: 'Open Free scene' }).click()
   await expect(page.getByRole('button', { name: 'Night' })).toHaveAttribute('aria-pressed', 'true')
 
   await page.getByRole('button', { name: 'Play', exact: true }).click()
@@ -74,17 +83,22 @@ test('edit, animate, save, reload, restore and export a populated scene', async 
   expect(errors).toEqual([])
 })
 
-test('keeps unreadable drafts and saves intact while editing', async ({ page }) => {
+test('keeps unreadable drafts, prototype data and collection items intact', async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('tinykit.scenes.v1.draft', '{bad draft')
+    localStorage.setItem('tinykit.scenes.v2.draft', '{bad draft')
+    localStorage.setItem('tinykit.scenes.v2.kept.bad', '{bad kept item')
+    localStorage.setItem('tinykit.scene.v1', '{old prototype data')
     localStorage.setItem('tinykit.scenes.v1.saved', '{bad save')
   })
-  await page.goto('/')
-  await expect(page.getByRole('status')).toContainText('Draft could not be read')
-  await page.getByRole('button', { name: 'Night' }).click()
-  await page.getByRole('button', { name: 'Save', exact: true }).click()
-  await expect(page.getByRole('status')).toContainText('previous save is unreadable')
+  await page.goto('/#tiny-scenes')
+  await expect(page.getByText('The current draft could not be read.')).toBeVisible()
+  await page.getByRole('button', { name: 'Keep', exact: true }).click()
+  await page.getByRole('button', { name: /Collection/ }).click()
+  await expect(page.getByText('1 unreadable collection entries were preserved.')).toBeVisible()
+  await page.getByRole('button', { name: 'Open v0.1 save' }).click()
+  await expect(page.getByRole('status')).toContainText('Could not open the v0.1 save')
   expect(await page.evaluate(() => [
-    localStorage.getItem('tinykit.scenes.v1.draft'), localStorage.getItem('tinykit.scenes.v1.saved'),
-  ])).toEqual(['{bad draft', '{bad save'])
+    localStorage.getItem('tinykit.scenes.v2.draft'), localStorage.getItem('tinykit.scenes.v2.kept.bad'),
+    localStorage.getItem('tinykit.scene.v1'), localStorage.getItem('tinykit.scenes.v1.saved'),
+  ])).toEqual(['{bad draft', '{bad kept item', '{old prototype data', '{bad save'])
 })

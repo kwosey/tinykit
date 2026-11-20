@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "environment": "Dusk",
+  "duration": 6,
+  "seed": 42,
+  "objects": [
+    {
+      "id": "person",
+      "kind": "Person",
+      "x": 364,
+      "y": 446,
+      "size": 1,
+      "color": "#e9ae78",
+      "text": "Hello, world",
+      "locked": false,
+      "motion": { "action": "Move", "start": 0, "duration": 6, "intensity": 2.5, "dx": 125, "dy": -7 }
+    }
+  ]
+}
