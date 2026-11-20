@@ -18,3 +18,9 @@ Story tests span each family and all ending variants, recurrence at the same see
 The Chromium story flow covers discovery, playback, switching, variation, beat locks, Direct, JSON round-trip, Keep, Undo/Redo, collection reopen and removal, and persistence after reload. Both desktop Chromium and Pixel 7 emulation execute it.
 
 For Preview review, open the scene on a desktop and a physical phone. Try each object and environment, drag a moving object from a scrubbed frame, adjust several motions, turn Loop off and let Play finish. Reload after editing, restore an explicit save, then import the exported JSON into another browser. Open the PNG and compare it with the stage at the exported playhead. Inspect the console during the flow.
+
+## Form Lab
+
+The unit suite verifies seeded variations, locks, ranges, history, bounded marks, parameter response and frame continuity for all eight effects, and storage isolation. The browser flows exercise the transport and loop modes, live slider changes, locked mutation, history, collection reopen, reload, invalid JSON, and navigation back to Tiny Scenes. They also render every preset and compare the 960 × 600 PNG with the visible canvas.
+
+For visual review, play each preset through two loops on desktop and a physical phone. Compare each effect at the minimum, midpoint and maximum of its main controls. Check responsiveness while dragging a slider during playback, then try Next and Mutate several times to judge how often the variations are worth keeping.

@@ -8,3 +8,4 @@ Build compact, playful experiments. Tiny Scenes is the first one. Keep the time 
 - Keep the scene engine independent of React. Compile story rules to the shared motion sampler. Validate role links, timing and locked beat behavior when changing the grammar. Keep shared primitives limited to patterns used by the editor. See [ARCHITECTURE.md](ARCHITECTURE.md).
 - Keep scene art in the existing geometric style. Creative content generation is outside this release.
 - Run `npm ci`, `npm test`, and `npm run build`. For editor changes, exercise desktop and mobile using [TESTING.md](TESTING.md).
+- Form Lab lives in `src/forms`. Keep effect sampling deterministic, the renderer bounded, and its schema and storage separate from Tiny Scenes. Add shared code only when both experiments use the same behavior.

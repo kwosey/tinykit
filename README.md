@@ -2,7 +2,9 @@
 
 Tiny Kit is an independent workspace for playable sketches. **Imagine → Build → Play → Evolve.**
 
-**Tiny Scenes** is a 16:9 playground for discovering little stories. On a fresh visit, press Play to watch a short, generated story. Try Another Story to switch to a different family or Mutate to find a new ending. Tap a beat to jump to that moment, lock it to protect it, and use Keep to save the version in Collection.
+**Form Lab** is a playground for visual behaviors and the default experiment at `/`. It opens with Orbital Loom. Use Next Composition to explore a different behavior, the six controls to shape the result, and Keep to save a snapshot. More settings includes the curated presets, duration, seed, and JSON and PNG export.
+
+**Tiny Scenes** is a 16:9 playground for discovering little stories at `/#tiny-scenes`. On a fresh visit, press Play to watch a short, generated story. Try Another Story to switch to a different family or Mutate to find a new ending. Tap a beat to jump to that moment, lock it to protect it, and use Keep to save the version in Collection.
 
 ## Run locally
 
@@ -21,9 +23,24 @@ Vite prints the local address. For a production build, run `npm run build`, then
 
 See [architecture](ARCHITECTURE.md), [scene JSON](DATA_CONTRACTS.md), [testing](TESTING.md), [decisions](DECISIONS.md) and [backlog](BACKLOG.md).
 
+## Form Lab presets
+
+| Starting composition | Behavior |
+| --- | --- |
+| Orbital Loom | Orbit |
+| Petal Hour | Bloom |
+| Tidal Thread | Flow |
+| Gravity Well | Collapse |
+| Magnetic Field | Attract / Repel |
+| Echo Chamber | Echo |
+| Prism Scatter | Split / Merge |
+| Breathing Grid | Distortion |
+
+Energy controls movement and reach, Order controls regularity, Density controls the number of marks, Tension controls pull and spread, Rhythm controls the pulse, and Complexity controls detail. Mutate varies unlocked controls while preserving the behavior, shape, palette and layout seed. The lock beside each slider applies to Mutate. Keep snapshots a composition in an independent collection.
+
 ## Preview and release
 
-Story Discovery depends on [v0.1 PR #2](https://github.com/kwosey/tinykit/pull/2). While that PR is open, the review base for v0.2 is `tinykit-v0.1-foundation`. Preview builds should use the existing Vercel project `tinykit`.
+Form Lab depends on [Story Discovery PR #3](https://github.com/kwosey/tinykit/pull/3). While v0.2 is unmerged, review Form Lab against `tinykit-v0.2-story-discovery`. Story Discovery depends on [v0.1 PR #2](https://github.com/kwosey/tinykit/pull/2). While that PR is open, the review base for v0.2 is `tinykit-v0.1-foundation`. Preview builds should use the existing Vercel project `tinykit`.
 
 
 The existing Vercel project `tinykit` hosts the original API-deployed prototype as deployment `dpl_GD8Uw5tkbAosEnjxJuAUu84WsiNJ`. The onboarding environment's proxy denied access to the deployment and Vercel API, so v0.1 implements the documented behavior. The original appearance, presets, timings, and legacy storage format remain unverified. Compare both versions before approving a production switch.
