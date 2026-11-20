@@ -93,6 +93,14 @@ describe('time and effects', () => {
     }
   })
 
+  it('adds marks to Distortion without pushing existing marks apart', () => {
+    const grid = presets.find(preset => preset.value.effect === 'Distortion')!.value
+    const sparse = sampleFrame({ ...grid, values: { ...grid.values, Density: 0 } }, 2)
+    const dense = sampleFrame({ ...grid, values: { ...grid.values, Density: 100 } }, 2)
+    expect(dense.length).toBeGreaterThan(sparse.length)
+    expect(dense.slice(0, sparse.length)).toEqual(sparse)
+  })
+
   it('replays and scrubs without mutating previously sampled frames', () => {
     const resting = { time: 0, playing: false }
     const playing = playback(resting, { type: 'play' }, initial.duration)

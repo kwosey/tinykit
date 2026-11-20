@@ -3,8 +3,9 @@ import { playback, type PlaybackAction } from '../foundation/playback'
 import { commit, history, redo, undo } from '../foundation/state'
 import { downloadBlob } from '../foundation/storage'
 import { FormCanvas } from './Canvas'
+import { ChoiceStrip } from './ChoiceStrip'
 import { decodeComposition, effects, mutate, nextComposition, palettes, parameters, presets, shapes,
-  type Composition, type Parameter } from './model'
+  type Composition, type Palette, type Parameter } from './model'
 import { keep, readCollection, readDraft, remove, saveDraft } from './storage'
 import './forms.css'
 
@@ -33,7 +34,11 @@ export function FormLab() {
   const file = useRef<HTMLInputElement>(null)
   const drag = useRef<{ key: Parameter; committed: boolean } | null>(null)
   const time = Math.min(clock.time, composition.duration)
-  const label = presets.find(preset => preset.value.effect === composition.effect)?.name ?? composition.effect
+  const matchingPreset = presets.find(({ value }) =>
+    value.version === composition.version && value.type === composition.type && value.effect === composition.effect &&
+    value.shape === composition.shape && value.palette === composition.palette && value.seed === composition.seed &&
+    value.duration === composition.duration && parameters.every(key =>
+      value.values[key] === composition.values[key] && value.locks[key] === composition.locks[key]))?.name
 
   useEffect(() => { setDraftError(!saveDraft(local, composition)) }, [composition])
   useEffect(() => {
@@ -124,7 +129,7 @@ export function FormLab() {
     <div className="form-heading">
       <div>
         <h1>Form Lab</h1>
-        <p>{label} <span>· {composition.effect}</span></p>
+        <p>{matchingPreset ?? 'Custom'} <span>· {composition.effect}</span></p>
       </div>
       <button aria-expanded={collectionOpen} onClick={() => {
         setCollection(readCollection(local))
@@ -200,30 +205,17 @@ export function FormLab() {
         </section>
         <details className="form-panel form-settings">
           <summary>More settings</summary>
-          <label>Starting composition
-            <select aria-label="Starting composition" value="" onChange={event => useComposition(presets[Number(event.target.value)].value, true)}>
-              <option value="" disabled>Choose a preset</option>
-              {presets.map((preset, index) => <option key={preset.name} value={index}>{preset.name}</option>)}
-            </select>
-          </label>
-          <label>Effect
-            <select aria-label="Effect" value={composition.effect} onChange={event =>
-              useComposition({ ...composition, effect: event.target.value as Composition['effect'] }, true)}>
-              {effects.map(value => <option key={value}>{value}</option>)}
-            </select>
-          </label>
-          <label>Shape
-            <select aria-label="Shape" value={composition.shape} onChange={event =>
-              useComposition({ ...composition, shape: event.target.value as Composition['shape'] })}>
-              {shapes.map(value => <option key={value}>{value}</option>)}
-            </select>
-          </label>
-          <label>Palette
-            <select aria-label="Palette" value={composition.palette} onChange={event =>
-              useComposition({ ...composition, palette: event.target.value as Composition['palette'] })}>
-              {Object.keys(palettes).map(value => <option key={value}>{value}</option>)}
-            </select>
-          </label>
+          <ChoiceStrip label="Starting composition" options={presets.map(preset => preset.name)}
+            selected={matchingPreset} custom onSelect={name => {
+              const preset = presets.find(item => item.name === name)
+              if (preset) useComposition(preset.value, true)
+            }} />
+          <ChoiceStrip label="Effect" options={effects} selected={composition.effect}
+            onSelect={effect => { if (effect !== composition.effect) useComposition({ ...composition, effect }, true) }} />
+          <ChoiceStrip label="Shape" options={shapes} selected={composition.shape}
+            onSelect={shape => { if (shape !== composition.shape) useComposition({ ...composition, shape }) }} />
+          <ChoiceStrip label="Palette" options={Object.keys(palettes) as Palette[]} selected={composition.palette}
+            onSelect={palette => { if (palette !== composition.palette) useComposition({ ...composition, palette }) }} />
           <label>Duration · {composition.duration} s
             <input aria-label="Duration" type="range" min={4} max={30} value={composition.duration}
               onChange={event => useComposition({ ...composition, duration: Number(event.target.value) })} />

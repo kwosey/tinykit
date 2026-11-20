@@ -109,7 +109,8 @@ const fields: Record<Effect, (sample: Sample) => Mark> = {
   Distortion: ({ index, u, random, phase, p }) => {
     const cell = (index * 17) % 120
     const col = cell % 12, row = Math.floor(cell / 12)
-    const x = (col - 5.5) * (36 + p.density * 7)
+    // Keep the Breathing Grid preset spacing while Density changes only the mark count.
+    const x = (col - 5.5) * 40.83
     const y = (row - 4.5) * 47
     const a = Math.hypot(x, y) / (68 - p.complexity * 31) - phase
     const warp = wave(a, p.rhythm) * (14 + p.tension * 61)
