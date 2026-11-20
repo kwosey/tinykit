@@ -119,7 +119,8 @@ function drawObject(ctx: CanvasRenderingContext2D, object: SceneObject, stride: 
 }
 
 export function renderScene(ctx: CanvasRenderingContext2D, scene: Scene, time: number, selected?: string) {
-  backdrop(ctx, scene.environment)
+  const change = scene.environmentChange
+  backdrop(ctx, change && time >= change.time ? change.to : scene.environment)
   for (const object of scene.objects) {
     const pose = poseAt(object, time)
     ctx.save()

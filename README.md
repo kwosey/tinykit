@@ -2,7 +2,7 @@
 
 Tiny Kit is an independent workspace for playable sketches. **Imagine → Build → Play → Evolve.**
 
-**Tiny Scenes** is a 16:9 Canvas scene editor. It opens with a populated scene. Pick an environment, drag a figure or select it from the object list, assign an action, and press Play. Use the scrubber to compose a still.
+**Tiny Scenes** is a 16:9 playground for discovering little stories. On a fresh visit, press Play to watch a short, generated story. Try Another Story to switch to a different family or Mutate to find a new ending. Tap a beat to jump to that moment, lock it to protect it, and use Keep to save the version in Collection.
 
 ## Run locally
 
@@ -15,13 +15,16 @@ npm run dev
 
 Vite prints the local address. For a production build, run `npm run build`, then `npm run preview`. No credentials or backend are needed to run the editor.
 
-- Add people, buildings, trees, cars or text. Adjust their position, size, color, layer, and motion.
-- Mutate changes unlocked objects. Shuffle also picks an environment and moves unlocked objects more widely. The seed makes each operation reproducible from the same starting scene.
-- The draft saves locally. Save creates a separate snapshot and Restore loads it. Use JSON to move scenes between browsers and PNG for a 960 × 540 still.
+- **Edit** opens beat timing and cast controls alongside the object editor. Add a matching object to recast a role. Choosing an ending locks Outcome until you unlock it.
+- Work in the free editor by importing a v0.1 scene or opening an older browser draft or save from Collection. The old data stays at its original key.
+- Import and export story or free scene JSON under Edit → Files. PNG captures the current 960 × 540 frame. Undo and Redo cover changes to the working draft, including switching stories.
 
 See [architecture](ARCHITECTURE.md), [scene JSON](DATA_CONTRACTS.md), [testing](TESTING.md), [decisions](DECISIONS.md) and [backlog](BACKLOG.md).
 
-## Prototype and release
+## Preview and release
+
+Story Discovery depends on [v0.1 PR #2](https://github.com/kwosey/tinykit/pull/2). While that PR is open, the review base for v0.2 is `tinykit-v0.1-foundation`. Preview builds should use the existing Vercel project `tinykit`.
+
 
 The existing Vercel project `tinykit` hosts the original API-deployed prototype as deployment `dpl_GD8Uw5tkbAosEnjxJuAUu84WsiNJ`. The onboarding environment's proxy denied access to the deployment and Vercel API, so v0.1 implements the documented behavior. The original appearance, presets, timings, and legacy storage format remain unverified. Compare both versions before approving a production switch.
 
