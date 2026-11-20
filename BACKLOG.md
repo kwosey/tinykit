@@ -6,3 +6,4 @@
 - Observe whether users can discover, vary and keep a story in the first minute. Add individual families or endings where variants feel repetitive.
 - Explore 9:16 compositions and fixed-step frame rendering for Instagram once discovery is validated.
 - Extract more shared primitives when a second experiment demonstrates concrete reuse.
+- Observe which Form Lab behaviors users keep and refine preset pacing after a physical-device playtest.

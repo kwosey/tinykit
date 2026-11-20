@@ -12,7 +12,7 @@ test('edit, animate, save, reload, restore and export a populated scene', async 
       localStorage.setItem('tinykit.scenes.v1.saved', JSON.stringify(scene))
     }
   }, initialScene)
-  await page.goto('/')
+  await page.goto('/#tiny-scenes')
   await expect(page.getByRole('heading', { name: 'Free scene' })).toBeVisible()
   await expect(page.getByRole('list', { name: 'Story beats' })).toHaveCount(0)
   const canvas = page.getByLabel('Scene preview')
@@ -90,7 +90,7 @@ test('keeps unreadable drafts, prototype data and collection items intact', asyn
     localStorage.setItem('tinykit.scene.v1', '{old prototype data')
     localStorage.setItem('tinykit.scenes.v1.saved', '{bad save')
   })
-  await page.goto('/')
+  await page.goto('/#tiny-scenes')
   await expect(page.getByText('The current draft could not be read.')).toBeVisible()
   await page.getByRole('button', { name: 'Keep', exact: true }).click()
   await page.getByRole('button', { name: /Collection/ }).click()

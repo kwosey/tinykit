@@ -18,3 +18,17 @@ Setup, Event and Outcome are ordered. The first two events are defined by the fa
 The compiler emits motion tracks for cast members. Each cue uses the original motion sampler, with relative Move deltas, multiplicative opacity/scale, and additive rotation. When it queues a later Move, the compiler samples the preceding cues at its starting time to determine the delta from that pose. The renderer, hit testing and PNG exporter use the resulting scene and time. Backdrop changes sample the same clock. Object editing changes the source scene, then the track is recompiled. A cast object's manually assigned action replaces its track.
 
 The Setup always begins at zero. Event starts at least half a second later, Outcome at least another half second later, and the scene leaves at least one second for its outcome. All generated endings use those intervals. Silent actors are hidden from the first frame. Visible fade-ins and departure motions start only when their outcome occurs.
+
+## Form Lab
+
+Form Lab is the default route. The hash navigation also opens Tiny Scenes directly at `/#tiny-scenes`. Each experiment owns its root component, history and storage namespace.
+
+| Module | Responsibility |
+| --- | --- |
+| `src/forms/model.ts` | Versioned document, shape and palette vocabulary, curated presets, seeded Next and Mutate, validation |
+| `src/forms/effects.ts` | Eight analytic fields mapping seeded marks and loop phase to frame geometry |
+| `src/forms/render.ts` | Canvas 2D palette and geometry drawing on a 960 × 600 backing canvas |
+| `src/forms/Canvas.tsx`, `App.tsx` | Stage, control interpolation, scrubber, history, collection and files |
+| `src/forms/storage.ts` | Isolated draft and per-entry snapshots |
+
+The experiments share the transport state transitions, deterministic number generator, immutable history and browser I/O helpers. Motion uses elapsed seconds and periodic functions, so rendering the same composition at a fixed time has no dependency on previous frames. Density fades in the last mark as count crosses an integer. A frame contains at most 111 marks, under the 112-mark cap. The stage eases changes to numeric parameters only while they are settling and stops requesting redraws when the paused image is stable. PNG captures the actual pixels currently on the stage, including a slider transition if one is in progress.

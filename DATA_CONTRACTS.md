@@ -55,3 +55,9 @@ The compiler derives tracks and backdrop transitions at runtime. They are omitte
 The working document is stored at `tinykit.scenes.v2.draft`. The app first looks for a valid v2 draft, then at the v0.1 draft and historical prototype key `tinykit.scene.v1`. A saved v0.1 scene and both older drafts can also be opened explicitly from Collection. Only documents that validate against the known version 1 scene contract are accepted from older keys. The actual API prototype schema could not be confirmed, so other shapes are preserved as bytes and reported as unsupported.
 
 Collection entries have one key per stable ID at `tinykit.scenes.v2.kept.<id>`. Each entry stores `{id, document, date}` where date is Unix epoch milliseconds. Keep snapshots the entire document and treats exact JSON equality as a duplicate. Opening a snapshot leaves the original available. An invalid entry is counted and preserved independently of valid entries. An unreadable v2 draft is protected from autosave. Storage is scoped to the browser origin, so use JSON for transfer between deployment URLs.
+
+## Form Lab document, version 1
+
+Form Lab JSON has `type: "form-lab"` and `version: 1`. It stores the effect, shape, and palette names from `src/forms/model.ts`, an unsigned 32-bit layout seed, duration in seconds (4–30), and six integer `values` (0–100) with corresponding Boolean `locks`. The parameter keys are Energy, Order, Density, Tension, Rhythm, and Complexity. Playback position, loop controls and the optional operation seed input are session state.
+
+The autosave key is `tinykit.form-lab.v1.draft`. Kept compositions use `tinykit.form-lab.v1.kept.<id>`, with `{id, savedAt, value}` per entry and a Unix epoch timestamp in milliseconds. Keep skips an identical normalized document. Unreadable drafts block autosave and unreadable collection entries are preserved independently of valid snapshots. Form Lab reads and writes only its own storage namespace.
