@@ -82,11 +82,11 @@ test('renders every preset and keeps both experiments independently accessible',
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/')
   await page.getByText('More settings', { exact: true }).click()
-  const selector = page.getByRole('combobox', { name: 'Starting composition' })
+  const selector = page.getByRole('group', { name: 'Starting composition' })
   const canvas = page.getByLabel('Composition canvas')
   const frames = new Set<string>()
   for (let i = 0; i < presets.length; i++) {
-    await selector.selectOption(String(i))
+    await selector.getByRole('button', { name: presets[i].name, exact: true }).click()
     await expect(page.locator('.form-heading p')).toContainText(presets[i].name)
     await page.getByRole('slider', { name: 'Scrub' }).fill('3')
     const sample = () => canvas.evaluate(element => (element as HTMLCanvasElement).toDataURL())
@@ -102,4 +102,80 @@ test('renders every preset and keeps both experiments independently accessible',
   expect(await page.evaluate(() => Boolean(localStorage.getItem('tinykit.scenes.v2.draft')) &&
     Boolean(localStorage.getItem('tinykit.form-lab.v1.draft')))).toBe(true)
   expect(errors).toEqual([])
+})
+
+
+test('choice strips preserve scroll, exact preset state and settings after reload', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/')
+  const settings = page.getByText('More settings', { exact: true })
+  await settings.click()
+  const preset = page.getByRole('group', { name: 'Starting composition' })
+  const effect = page.getByRole('group', { name: 'Effect', exact: true })
+  const shape = page.getByRole('group', { name: 'Shape' })
+  const palette = page.getByRole('group', { name: 'Palette' })
+  await expect(preset.getByRole('button', { name: 'Orbital Loom' })).toHaveAttribute('aria-pressed', 'true')
+  await preset.getByRole('button', { name: 'Breathing Grid' }).click()
+  await expect(preset.getByRole('button', { name: 'Breathing Grid' })).toHaveAttribute('aria-pressed', 'true')
+  const position = await preset.evaluate(element => element.scrollLeft)
+  expect(position).toBeGreaterThan(0)
+  await shape.getByRole('button', { name: 'Triangle' }).click()
+  await palette.getByRole('button', { name: 'Ember' }).click()
+  await effect.getByRole('button', { name: 'Echo', exact: true }).focus()
+  await page.keyboard.press('Enter')
+  await expect(effect.getByRole('button', { name: 'Echo', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await expect(preset.getByRole('button', { pressed: true })).toHaveCount(0)
+  await expect(page.getByText('Custom', { exact: true })).toBeVisible()
+  expect(await preset.evaluate(element => element.scrollLeft)).toBeCloseTo(position, 0)
+  await page.reload()
+  await settings.click()
+  await expect(effect.getByRole('button', { name: 'Echo', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await expect(shape.getByRole('button', { name: 'Triangle' })).toHaveAttribute('aria-pressed', 'true')
+  await expect(palette.getByRole('button', { name: 'Ember' })).toHaveAttribute('aria-pressed', 'true')
+  expect(await effect.evaluate(element => {
+    const active = element.querySelector('[aria-pressed=true]')!.getBoundingClientRect()
+    const row = element.getBoundingClientRect()
+    return active.left >= row.left - 1 && active.right <= row.right + 1
+  })).toBe(true)
+})
+
+test('iPhone widths keep transport compact and touch swipes inside option strips', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'Touch and iPhone-size layout')
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  const cdp = await page.context().newCDPSession(page)
+  for (const width of [320, 375, 390, 428]) {
+    await page.setViewportSize({ width, height: 850 })
+    await page.goto('/')
+    const actions = await page.locator('.form-actions button').evaluateAll(buttons =>
+      buttons.map(button => ({ top: button.getBoundingClientRect().top, height: button.getBoundingClientRect().height })))
+    expect(new Set(actions.map(action => action.top)).size).toBe(width <= 380 ? 2 : 1)
+    expect(actions.every(action => action.height >= 44)).toBe(true)
+    await page.getByText('More settings', { exact: true }).click()
+    const strip = page.getByRole('group', { name: 'Effect', exact: true })
+    await strip.scrollIntoViewIfNeeded()
+    const original = await strip.getByRole('button', { pressed: true }).textContent()
+    const box = (await strip.boundingBox())!
+    const x = box.x + box.width * 0.85
+    const y = box.y + box.height * 0.4
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] })
+    for (let step = 1; step <= 6; step++) {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x - box.width * 0.7 * step / 6, y }] })
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+    await expect.poll(() => strip.evaluate(element => element.scrollLeft)).toBeGreaterThan(0)
+    await expect(strip.getByRole('button', { pressed: true })).toHaveText(original!)
+    await strip.getByRole('button', { name: 'Distortion' }).tap()
+    await expect(strip.getByRole('button', { pressed: true })).toHaveText('Distortion')
+    for (const scale of ['100%', '140%']) {
+      await page.locator('html').evaluate((element, value) => { element.style.fontSize = value }, scale)
+      expect(await page.evaluate(() => document.documentElement.scrollWidth === innerWidth && scrollX === 0)).toBe(true)
+      expect(await page.locator('.form-control').evaluateAll(controls => controls.every(control => {
+        const lock = control.querySelector('button')!.getBoundingClientRect()
+        const value = control.querySelector('.form-value')!.getBoundingClientRect()
+        const slider = control.querySelector('input')!.getBoundingClientRect()
+        return lock.height >= 44 && value.bottom <= lock.top + 1 && slider.right <= lock.left
+      }))).toBe(true)
+    }
+  }
+  await cdp.detach()
 })
